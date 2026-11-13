@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EcoTrack – Your Daily Sustainability Companion</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--g:#16a34a;--g2:#22c55e;--b:#38bdf8;--bg:#f0fdf4;--card:#fff;--tx:#0f2e1f;--mut:#5b7266;--line:#dcefe3;--sh:0 6px 24px rgba(22,163,74,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a13;--card:#12281d;--tx:#e8f5ec;--mut:#9bb5a5;--line:#22402f}}
+:root[data-theme="dark"]{--bg:#0b1a13;--card:#12281d;--tx:#e8f5ec;--mut:#9bb5a5;--line:#22402f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--tx);background:linear-gradient(160deg,var(--bg),#e0f2fe 120%) fixed;background-color:var(--bg);line-height:1.5}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(160deg,#0b1a13,#0c2230) fixed}}
+h1,h2,h3{line-height:1.2;margin:0 0 .5rem}
+a{color:var(--g)}
+svg.i{width:1.2em;height:1.2em;vertical-align:-.2em;fill:currentColor}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(90deg,#15803d,#16a34a 55%,#0ea5e9);color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.15)}
+.bar{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;gap:1rem}
+.logo{font-weight:800;font-size:1.3rem;color:#fff;text-decoration:none;display:flex;gap:.4rem;align-items:center}
+nav{display:flex;gap:.25rem}
+nav a{color:#fff;text-decoration:none;padding:.45rem .8rem;border-radius:99px;font-size:.92rem;transition:.2s}
+nav a:hover{background:rgba(255,255,255,.2);transform:translateY(-1px)}
+nav a.on{background:#fff;color:#15803d;font-weight:600}
+#burger{display:none;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:10px;padding:.45rem .7rem;font-size:1.2rem;cursor:pointer}
+@media(max-width:820px){#burger{display:block}nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:#15803d;padding:.6rem 1rem 1rem}nav.open{display:flex}}
+main{max-width:1100px;margin:auto;padding:1.2rem 1rem 3rem}
+.view{animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:1.5rem;align-items:center;border-radius:28px;padding:2.5rem;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e 55%,#7dd3fc);box-shadow:var(--sh);overflow:hidden}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem);margin:0}
+.hero .tag{font-size:1.3rem;font-weight:600;margin:.3rem 0 1rem}
+.hero p{max-width:34rem;opacity:.95}
+.hero svg.art{width:100%;max-width:320px;margin:auto;animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding:1.6rem}}
+.btn{display:inline-flex;gap:.4rem;align-items:center;border:0;cursor:pointer;font:inherit;font-weight:600;padding:.7rem 1.3rem;border-radius:99px;background:var(--g);color:#fff;text-decoration:none;transition:.2s;box-shadow:0 4px 12px rgba(22,163,74,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(22,163,74,.35)}
+.btn.w{background:#fff;color:#15803d}.btn.o{background:transparent;color:var(--g);box-shadow:none;border:2px solid var(--g)}.btn.r{background:#dc2626}.btn.s{padding:.35rem .8rem;font-size:.85rem}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:1.2rem 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:1.2rem;box-shadow:var(--sh);transition:.25s}
+.card:hover{transform:translateY(-4px)}
+.stat .big{font-size:2.1rem;font-weight:800}
+.stat .lab{color:var(--mut);font-size:.9rem;display:flex;gap:.4rem;align-items:center}
+.ic{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:10px;color:#fff}
+.wt{background:linear-gradient(135deg,#0ea5e9,#7dd3fc)}.el{background:linear-gradient(135deg,#eab308,#facc15)}.lf{background:linear-gradient(135deg,#16a34a,#4ade80)}
+.prog{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:.6rem}
+.prog i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#22c55e,#38bdf8);transition:width .8s ease}
+.prog i.over{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.msg{padding:.9rem 1.1rem;border-radius:16px;background:linear-gradient(90deg,#dcfce7,#e0f2fe);color:#14532d;font-weight:500;margin:1rem 0;border:1px solid #bbf7d0}
+.cw{position:relative;height:250px}
+label{display:block;font-weight:600;font-size:.88rem;margin:.6rem 0 .2rem}
+input,select{width:100%;padding:.65rem .8rem;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--tx);font:inherit}
+input:focus,select:focus{outline:2px solid var(--b);border-color:var(--b)}
+.err{color:#dc2626;font-size:.88rem;min-height:1.2em;margin:.4rem 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+.two{display:grid;gap:1rem;grid-template-columns:1fr 1.2fr}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+.entry{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.6rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.entry small{color:var(--mut);display:block}
+.entry div:last-child{display:flex;gap:.4rem}
+.empty{color:var(--mut);text-align:center;padding:1rem}
+ul.t{padding-left:1.1rem;margin:.4rem 0}ul.t li{margin:.35rem 0}
+.sec h2{font-size:1.6rem;margin-top:.4rem}.sec>p{color:var(--mut);margin-top:0}
+.tip{font-size:1.15rem}.tip .em{font-size:2.2rem}
+.sdg{border-top:5px solid var(--c)}.sdg b{color:var(--c);font-size:1.5rem}
+.hab{display:flex;gap:.6rem;align-items:center;padding:.7rem 1rem;border:2px solid var(--line);border-radius:14px;cursor:pointer;margin:.4rem 0;transition:.2s;background:var(--card)}
+.hab:hover{border-color:var(--g2);transform:translateX(4px)}
+.hab.sel{border-color:var(--g);background:#dcfce7;color:#14532d}
+.hab input{width:auto}
+.pledge{text-align:center;background:linear-gradient(135deg,#16a34a,#38bdf8);color:#fff;animation:pop .6s}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.pledge li{text-align:left}
+footer{background:linear-gradient(135deg,#14532d,#0c4a6e);color:#d1fae5;padding:2rem 1rem 1.4rem}
+footer .in{max-width:1100px;margin:auto;display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+footer h3{color:#fff}footer a{color:#bbf7d0}footer p{margin:.3rem 0;font-size:.92rem}
+.copy{max-width:1100px;margin:1.4rem auto 0;border-top:1px solid rgba(255,255,255,.2);padding-top:1rem;font-size:.85rem}
+dialog{border:0;border-radius:20px;padding:1.5rem;max-width:380px;background:var(--card);color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog .a{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem}
+#toast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,150%);background:#14532d;color:#fff;padding:.7rem 1.2rem;border-radius:99px;transition:.35s;z-index:50;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+.hl{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="drop" viewBox="0 0 24 24"><path d="M12 2.5s6.5 7 6.5 12a6.5 6.5 0 0 1-13 0c0-5 6.5-12 6.5-12z"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13.5h6L10 22l9-12h-6z"/></symbol>
+<symbol id="leaf" viewBox="0 0 24 24"><path d="M20 3C9 3 4 9 4 15c0 1.6.4 3 1.200 4.200C6 14 9 11 13 9c-3 3-5 6-5.500 10.500C8.500 20.500 9.700 21 11 21c6 0 9-6 9-18z"/></symbol>
+</svg>
+
+<header><div class="bar">
+<a class="logo" href="#home"><svg class="i"><use href="#leaf"/></svg>EcoTrack</a>
+<button id="burger" aria-label="Menu">☰</button>
+<nav id="nav">
+<a href="#home" data-v="home">Home</a><a href="#dashboard" data-v="dashboard">Dashboard</a><a href="#water" data-v="water">Water</a><a href="#electricity" data-v="electricity">Electricity</a><a href="#tips" data-v="tips">Eco Tips</a><a href="#progress" data-v="progress">Progress</a><a href="#ethics" data-v="ethics">Ethics &amp; Pledge</a>
+</nav></div></header>
+
+<main>
+<!-- HOME -->
+<section class="view" id="v-home">
+<div class="hero"><div>
+<h1>EcoTrack</h1><div class="tag">Small Steps. Greener Future</div>
+<p>Welcome! EcoTrack is your daily sustainability companion. Log the water and electricity you use, watch your habits improve, and pick up realistic tips along the way. Everything stays on your own device.</p>
+<div class="hl"><a class="btn w" href="#water">Start Tracking →</a><a class="btn o" style="color:#fff;border-color:#fff" href="#ethics">Take the Green Pledge</a></div></div>
+<svg class="art" viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="150" r="130" fill="rgba(255,255,255,.18)"/><path d="M150 40s60 62 60 108a60 60 0 0 1-120 0c0-46 60-108 60-108z" fill="#e0f2fe"/><path d="M150 100c-30 20-40 50-30 80 20-5 50-25 30-80z" fill="#22c55e"/><path d="M215 190l-30 50h24l-8 38 40-56h-26z" fill="#fde047"/><circle cx="70" cy="80" r="8" fill="#fff" opacity=".7"/><circle cx="240" cy="90" r="5" fill="#fff" opacity=".7"/></svg></div>
+<div class="grid">
+<div class="card"><span class="ic wt"><svg class="i"><use href="#drop"/></svg></span><h3>Track water</h3><p>Log litres used and get practical ways to cut waste.</p><a class="btn s" href="#water">Open water tracker</a></div>
+<div class="card"><span class="ic el"><svg class="i"><use href="#bolt"/></svg></span><h3>Track electricity</h3><p>Log kWh and find simple energy-saving habits.</p><a class="btn s" href="#electricity">Open electricity tracker</a></div>
+<div class="card"><span class="ic lf"><svg class="i"><use href="#leaf"/></svg></span><h3>See your progress</h3><p>Daily and weekly summaries update automatically.</p><a class="btn s" href="#dashboard">Open dashboard</a></div>
+</div>
+<div class="card"><h3>🔒 Your data stays with you</h3><p style="margin:0">EcoTrack has no accounts and no server. Entries are saved only in this browser’s localStorage and are never sent anywhere. <a href="#ethics">Read more</a>.</p></div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="view sec" id="v-dashboard" hidden>
+<h2>Dashboard</h2><p>Your consumption at a glance. Summaries and charts update as you add entries.</p>
+<div class="msg" id="dmsg"></div>
+<div class="grid">
+<div class="card stat"><div class="lab"><span class="ic wt"><svg class="i"><use href="#drop"/></svg></span>Water today</div><div class="big" id="d-wt">0 L</div><div class="lab" id="d-wg"></div><div class="prog"><i id="p-wt"></i></div></div>
+<div class="card stat"><div class="lab"><span class="ic el"><svg class="i"><use href="#bolt"/></svg></span>Electricity today</div><div class="big" id="d-et">0 kWh</div><div class="lab" id="d-eg"></div><div class="prog"><i id="p-et"></i></div></div>
+<div class="card stat"><div class="lab"><span class="ic wt"><svg class="i"><use href="#drop"/></svg></span>Water – last 7 days</div><div class="big" id="d-ww">0 L</div><div class="lab" id="d-wa"></div><div class="prog"><i id="p-ww"></i></div></div>
+<div class="card stat"><div class="lab"><span class="ic el"><svg class="i"><use href="#bolt"/></svg></span>Electricity – last 7 days</div><div class="big" id="d-ew">0 kWh</div><div class="lab" id="d-ea"></div><div class="prog"><i id="p-ew"></i></div></div>
+</div>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+<div class="card"><h3>Daily water (L)</h3><div class="cw"><canvas id="c-w"></canvas></div></div>
+<div class="card"><h3>Daily electricity (kWh)</h3><div class="cw"><canvas id="c-e"></canvas></div></div>
+</div>
+<div class="card"><h3>Daily goals</h3><p style="color:var(--mut);margin-top:0">Personal targets for the progress bars. Typical use varies a lot by household, so set what feels realistic for you.</p>
+<div class="row"><div><label for="g-w">Water goal (L/day)</label><input id="g-w" type="number" min="1" max="5000" step="1"></div><div><label for="g-e">Electricity goal (kWh/day)</label><input id="g-e" type="number" min="0.1" max="500" step="0.1"></div></div>
+<div class="err" id="g-err"></div><div class="hl" style="margin-top:0"><button class="btn" id="g-save">Save goals</button><button class="btn o" id="sample">Load sample data</button><button class="btn r" id="reset">Reset all data</button></div></div>
+</section>
+
+<!-- WATER -->
+<section class="view sec" id="v-water" hidden>
+<h2><svg class="i" style="color:#0ea5e9"><use href="#drop"/></svg> Water tracker</h2><p>Log water in litres. Multiple entries per day are added together.</p>
+<div class="two"><div class="card"><h3 id="w-title">Add entry</h3>
+<form id="f-w" novalidate><label for="w-d">Date</label><input type="date" id="w-d" required>
+<label for="w-v">Litres used</label><input type="number" id="w-v" min="0.1" max="5000" step="0.1" placeholder="e.g. 45" required>
+<label for="w-n">Activity (optional)</label><select id="w-n"><option value="">General</option><option>Shower / bath</option><option>Cooking &amp; drinking</option><option>Laundry</option><option>Dishes</option><option>Garden</option><option>Cleaning</option></select>
+<div class="err" id="w-err"></div><div class="hl" style="margin:0"><button class="btn" type="submit" id="w-btn">Save entry</button><button class="btn o" type="button" id="w-cancel" hidden>Cancel</button></div></form></div>
+<div class="card"><h3>Total: <span id="w-tot">0 L</span> <small style="color:var(--mut);font-weight:400">(today <span id="w-today">0 L</span>)</small></h3><div id="w-list"></div></div></div>
+<div class="card" style="margin-top:1rem"><h3>💧 Ways to reduce water waste</h3><div class="msg" id="w-sug"></div>
+<ul class="t"><li>Shorter showers: a typical shower head uses roughly 8–10 L per minute, so each minute saved matters.</li><li>Fix leaks: a dripping tap or running toilet can waste tens of litres a day.</li><li>Turn the tap off while brushing teeth or scrubbing dishes.</li><li>Run washing machines and dishwashers only with full loads.</li><li>Water plants early morning or evening, and reuse rinse water for plants where safe.</li></ul></div>
+</section>
+
+<!-- ELECTRICITY -->
+<section class="view sec" id="v-electricity" hidden>
+<h2><svg class="i" style="color:#eab308"><use href="#bolt"/></svg> Electricity tracker</h2><p>Log electricity in units (kWh), as shown on your meter or bill.</p>
+<div class="two"><div class="card"><h3 id="e-title">Add entry</h3>
+<form id="f-e" novalidate><label for="e-d">Date</label><input type="date" id="e-d" required>
+<label for="e-v">Units used (kWh)</label><input type="number" id="e-v" min="0.1" max="500" step="0.1" placeholder="e.g. 5.5" required>
+<label for="e-n">Main use (optional)</label><select id="e-n"><option value="">General</option><option>Cooling / heating</option><option>Lighting</option><option>Appliances</option><option>Cooking</option><option>Electronics</option></select>
+<div class="err" id="e-err"></div><div class="hl" style="margin:0"><button class="btn" type="submit" id="e-btn">Save entry</button><button class="btn o" type="button" id="e-cancel" hidden>Cancel</button></div></form></div>
+<div class="card"><h3>Total: <span id="e-tot">0 kWh</span> <small style="color:var(--mut);font-weight:400">(today <span id="e-today">0 kWh</span>)</small></h3><div id="e-list"></div></div></div>
+<div class="card" style="margin-top:1rem"><h3>⚡ Energy-saving tips</h3><div class="msg" id="e-sug"></div>
+<ul class="t"><li>Switch off lights and fans when you leave a room.</li><li>Use LED bulbs; they use far less energy than old incandescent ones.</li><li>Set air conditioners around 24–26 °C and clean filters regularly.</li><li>Unplug chargers and devices that sit on standby; it adds up over a month.</li><li>Use natural light and air-dry clothes when the weather allows.</li></ul></div>
+</section>
+
+<!-- TIPS -->
+<section class="view sec" id="v-tips" hidden>
+<h2>Daily eco tips</h2><p>One new tip every day. Small, honest habits beat grand gestures.</p>
+<div class="card tip" style="background:linear-gradient(135deg,#dcfce7,#e0f2fe);color:#14532d"><div class="em" id="t-em"></div><b>Tip of the day</b><p id="t-tx" style="margin:.3rem 0 .8rem"></p><button class="btn" id="t-next">Show another tip</button></div>
+<h3 style="margin-top:1.4rem">All tips</h3><div class="grid" id="t-all"></div>
+</section>
+
+<!-- PROGRESS -->
+<section class="view sec" id="v-progress" hidden>
+<h2>Progress tracker</h2><p>Weekly history and how this week compares with last week.</p>
+<div class="msg" id="pmsg"></div>
+<div class="grid">
+<div class="card stat"><div class="lab"><span class="ic wt"><svg class="i"><use href="#drop"/></svg></span>Water change vs last week</div><div class="big" id="pr-w">–</div><div class="lab" id="pr-wd"></div></div>
+<div class="card stat"><div class="lab"><span class="ic el"><svg class="i"><use href="#bolt"/></svg></span>Electricity change vs last week</div><div class="big" id="pr-e">–</div><div class="lab" id="pr-ed"></div></div></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+<div class="card"><h3>Weekly water (L)</h3><div class="cw"><canvas id="c-ww"></canvas></div></div>
+<div class="card"><h3>Weekly electricity (kWh)</h3><div class="cw"><canvas id="c-we"></canvas></div></div></div>
+</section>
+
+<!-- ETHICS -->
+<section class="view sec" id="v-ethics" hidden>
+<h2>Sustainability &amp; Ethics</h2><p>Why these habits matter, and how EcoTrack treats your data.</p>
+<div class="grid">
+<div class="card"><h3>💧 Why save water and electricity?</h3><p>Fresh water is limited and treating and pumping it takes energy. Electricity in many places still comes partly from fossil fuels, so using less can mean fewer greenhouse gas emissions. Saving also lowers your bills.</p></div>
+<div class="card"><h3>🌍 Individual actions count</h3><p>One household won’t solve climate change alone, and it’s honest to say so. But habits spread, they add up across millions of people, and they push shops, employers and governments to act too.</p></div>
+<div class="card"><h3>♻️ Responsible consumption</h3><ul class="t"><li>Buy only what you need; repair and reuse first.</li><li>Choose reusable bottles, bags and containers.</li><li>Cut food waste; growing and moving food uses water and energy.</li><li>Prefer efficient appliances when you do replace them.</li></ul></div></div>
+<h3>UN Sustainable Development Goals</h3>
+<div class="grid">
+<div class="card sdg" style="--c:#26bde2"><b>SDG 6</b><h3>Clean Water &amp; Sanitation</h3><p>Safe water for everyone. Using water carefully leaves more for others and protects rivers and groundwater.</p></div>
+<div class="card sdg" style="--c:#fcc30b"><b>SDG 7</b><h3>Affordable &amp; Clean Energy</h3><p>Efficient energy use reduces demand, making it easier for clean sources to meet our needs.</p></div>
+<div class="card sdg" style="--c:#bf8b2e"><b>SDG 12</b><h3>Responsible Consumption</h3><p>Using resources wisely and creating less waste is the heart of this goal.</p></div>
+<div class="card sdg" style="--c:#3f7e44"><b>SDG 13</b><h3>Climate Action</h3><p>Less energy and water use means lower emissions, a small contribution to tackling climate change.</p></div></div>
+<div class="card"><h3>🔒 Privacy &amp; responsible data use</h3><ul class="t"><li><b>Minimal data:</b> EcoTrack asks only for a date, an amount and an optional category. No name, email, location or account.</li><li><b>How it’s stored:</b> entries live in your browser’s localStorage on this device. Clearing site data, using another browser or private mode means they won’t be there.</li><li><b>Never shared:</b> there is no server, analytics or tracking. Your numbers are not sent or sold.</li><li><b>You’re in control:</b> edit or delete any entry, or use “Reset all data” on the Dashboard.</li><li><b>Honest numbers:</b> savings shown are based only on what you enter. Real impact depends on your local water and power sources.</li></ul></div>
+<h3 style="margin-top:1.4rem">🌱 Take the Green Pledge</h3>
+<div id="pl-wrap"></div>
+</section>
+</main>
+
+<footer><div class="in">
+<div><h3>About Us</h3><p>EcoTrack is a free, open learning project that helps people notice their daily water and electricity use and build greener habits.</p></div>
+<div><h3>Contact</h3><p>EcoTrack runs entirely in your browser and has no server or inbox, so no messages are collected. To publish this app yourself, add your own contact details here.</p></div>
+<div><h3>Sustainability</h3><p><a href="#ethics">Sustainability &amp; Ethics</a></p><p><a href="#tips">Daily eco tips</a></p><p><a href="#ethics">Take the Green Pledge</a></p></div>
+</div><div class="copy">© 2026 EcoTrack · Small Steps. Greener Future · Your data stays on your device.</div></footer>
+
+<dialog id="dlg"><h3 id="dlg-t">Are you sure?</h3><p id="dlg-p"></p><div class="a"><button class="btn o s" id="dlg-no">Cancel</button><button class="btn r s" id="dlg-yes">Confirm</button></div></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEY="ecotrack:v1";
+let S={entries:[],goals:{w:150,e:6},pledge:null};
+try{const r=localStorage.getItem(KEY);if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.entries))S=Object.assign(S,p)}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Couldn’t save: browser storage is unavailable.")}};
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>ymd(new Date());
+const addD=(s,n)=>{const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return ymd(d)};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r1=n=>Math.round(n*10)/10;
+const U={w:"L",e:"kWh"};
+const tot=(t,a,b)=>r1(S.entries.filter(x=>x.t===t&&x.d>=a&&x.d<=b).reduce((s,x)=>s+x.v,0));
+const wk=(t,i)=>tot(t,addD(today(),-6-7*i),addD(today(),-7*i));
+const fmtD=s=>new Date(s+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"});
+let tm;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(tm);tm=setTimeout(()=>t.classList.remove("show"),2800)}
+function ask(title,text,ok){return new Promise(res=>{$("#dlg-t").textContent=title;$("#dlg-p").textContent=text;$("#dlg-yes").textContent=ok||"Confirm";const d=$("#dlg");const done=v=>{d.close();res(v)};$("#dlg-yes").onclick=()=>done(true);$("#dlg-no").onclick=()=>done(false);d.oncancel=()=>res(false);d.showModal()})}
+
+/* charts */
+const charts={};
+function mk(id,type,labels,data,color,unit){
+  if(charts[id])charts[id].destroy();
+  const mut=getComputedStyle(document.documentElement).getPropertyValue("--mut").trim()||"#5b7266";
+  const ctx=$("#"+id).getContext("2d");
+  const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,color);g.addColorStop(1,color+"33");
+  charts[id]=new Chart(ctx,{type,data:{labels,datasets:[{label:unit,data,backgroundColor:g,borderColor:color,borderWidth:2,borderRadius:8,fill:true,tension:.35,pointRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,animation:{duration:700},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:mut},grid:{color:"rgba(120,160,140,.2)"},title:{display:true,text:unit,color:mut}},x:{ticks:{color:mut},grid:{display:false}}}}});
+}
+const days7=()=>Array.from({length:7},(_,i)=>addD(today(),i-6));
+
+/* messages */
+function encourage(){
+  const t=today(),y=addD(t,-1),m=[];
+  ["w","e"].forEach(k=>{
+    const n=k==="w"?"water":"electricity",cw=wk(k,0),pw=wk(k,1),a=tot(k,t,t),b=tot(k,y,y);
+    if(pw>0&&cw>0&&cw<pw)m.push(`🎉 Great job! You used ${Math.round((1-cw/pw)*100)}% less ${n} than the previous 7 days.`);
+    else if(b>0&&a>0&&a<b)m.push(`🌿 Nice, today’s ${n} use is lower than yesterday’s.`);
+  });
+  return m.length?m.join(" "):"🌱 Log your usage to see how you’re doing. Every small step counts!";
+}
+
+/* renderers */
+function setProg(id,v,goal){const el=$("#"+id);el.style.width=Math.min(100,goal>0?v/goal*100:0)+"%";el.classList.toggle("over",v>goal)}
+function renderDash(){
+  const t=today(),a=addD(t,-6),G=S.goals;
+  $("#g-w").value=G.w;$("#g-e").value=G.e;$("#dmsg").textContent=encourage();
+  [["w","wt","ww","wa","wg"],["e","et","ew","ea","eg"]].forEach(([k,td,wkid,avg,gl])=>{
+    const dv=tot(k,t,t),wv=tot(k,a,t),g=G[k];
+    $("#d-"+td).textContent=dv+" "+U[k];$("#d-"+wkid).textContent=wv+" "+U[k];
+    $("#d-"+avg).textContent="Average "+r1(wv/7)+" "+U[k]+"/day";
+    $("#d-"+gl).textContent=Math.round(g>0?dv/g*100:0)+"% of "+g+" "+U[k]+" goal";
+    setProg("p-"+td,dv,g);setProg("p-"+wkid,wv,g*7);
+  });
+  const d=days7(),lb=d.map(fmtD);
+  mk("c-w","bar",lb,d.map(x=>tot("w",x,x)),"#0ea5e9","Litres");
+  mk("c-e","line",lb,d.map(x=>tot("e",x,x)),"#16a34a","kWh");
+}
+function renderList(k){
+  const rows=S.entries.filter(x=>x.t===k).sort((a,b)=>b.d.localeCompare(a.d)||b.id.localeCompare(a.id));
+  const all=r1(rows.reduce((s,x)=>s+x.v,0));
+  $("#"+k+"-tot").textContent=all+" "+U[k];$("#"+k+"-today").textContent=tot(k,today(),today())+" "+U[k];
+  $("#"+k+"-list").innerHTML=rows.length?rows.slice(0,40).map(x=>`<div class="entry"><div><b>${x.v} ${U[k]}</b><small>${fmtD(x.d)}${x.n?" · "+esc(x.n):""}</small></div><div><button class="btn o s" data-act="edit" data-k="${k}" data-id="${x.id}">Edit</button><button class="btn r s" data-act="del" data-k="${k}" data-id="${x.id}">Delete</button></div></div>`).join("")+(rows.length>40?`<p class="empty">Showing the latest 40 of ${rows.length} entries.</p>`:""):`<div class="empty">No entries yet. Add your first one!</div>`;
+  const td=tot(k,today(),today()),g=S.goals[k],s=$("#"+k+"-sug");
+  s.textContent=td===0?"Log today’s usage to get a personalised suggestion.":td>g?`Today’s ${k==="w"?"water":"electricity"} use (${td} ${U[k]}) is above your ${g} ${U[k]} goal. Try one tip below and see how tomorrow goes.`:`Well done: you’re within your ${g} ${U[k]} daily goal. Keep it up! 🌿`;
+}
+function renderProg(){
+  const lb=["3 wks ago","2 wks ago","Last wk","This wk"],idx=[3,2,1,0];
+  mk("c-ww","bar",lb,idx.map(i=>wk("w",i)),"#0ea5e9","Litres");
+  mk("c-we","bar",lb,idx.map(i=>wk("e",i)),"#16a34a","kWh");
+  ["w","e"].forEach(k=>{
+    const c=wk(k,0),p=wk(k,1),el=$("#pr-"+k),ds=$("#pr-"+k+"d");
+    if(p>0&&c>0){const pc=Math.round((c-p)/p*100);el.textContent=(pc<=0?"▼ ":"▲ ")+Math.abs(pc)+"%";ds.textContent=pc<=0?`Saved ${r1(p-c)} ${U[k]} compared with last week`:`${r1(c-p)} ${U[k]} more than last week`}
+    else{el.textContent="–";ds.textContent="Need entries in both weeks to compare"}
+  });
+  $("#pmsg").textContent=encourage();
+}
+const TIPS=[["💡","Switch off lights and fans when you leave the room."],["🚰","Close leaking taps fully and fix drips; they waste water around the clock."],["🛍️","Carry a reusable bag and bottle to avoid unnecessary single-use plastic."],["🚿","Cut your shower by a minute or two. It saves several litres each time."],["🔌","Unplug chargers and devices on standby when not in use."],["🥗","Plan meals to reduce food waste; food takes water and energy to produce."],["🧺","Wash clothes with full loads and use cold water when it’s enough."],["❄️","Set the AC around 24–26 °C and keep filters clean for better efficiency."],["🌿","Water plants in the morning or evening to reduce evaporation."],["♻️","Repair, reuse or donate before buying new."],["☀️","Open curtains for daylight and dry clothes in the sun when you can."],["🚶","Walk, cycle or share rides for short trips. It’s good for the climate and you."]];
+let tOff=0;
+function renderTips(){
+  const n=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5),t=TIPS[(n+tOff)%TIPS.length];
+  $("#t-em").textContent=t[0];$("#t-tx").textContent=t[1];
+  $("#t-all").innerHTML=TIPS.map(x=>`<div class="card"><div style="font-size:1.8rem">${x[0]}</div>${esc(x[1])}</div>`).join("");
+}
+const HABS=["Take shorter showers (5 minutes or less)","Switch off lights and fans when leaving a room","Fix or report leaking taps promptly","Carry a reusable bottle and bag","Unplug devices on standby","Run laundry and dishwasher only with full loads","Avoid wasting food","Walk, cycle or share rides for short trips"];
+let pick=[];
+function renderPledge(){
+  const w=$("#pl-wrap");
+  if(S.pledge){w.innerHTML=`<div class="card pledge"><div style="font-size:2.4rem">🌍</div><h3>You took the Green Pledge!</h3><p>On ${fmtD(S.pledge.d)} you committed to:</p><ul class="t">${S.pledge.h.map(h=>`<li>${esc(h)}</li>`).join("")}</ul><p>Small steps, real change. Thank you! 💚</p><button class="btn w" id="pl-change">Change my pledge</button></div>`;
+    $("#pl-change").onclick=()=>{pick=[...S.pledge.h];S.pledge=null;save();renderPledge()};return}
+  w.innerHTML=`<div class="card"><p style="margin-top:0">Choose <b>exactly three</b> habits you’ll try. Pick realistic ones you can keep. <b id="pl-n">${pick.length}/3</b></p>${HABS.map((h,i)=>`<label class="hab${pick.includes(h)?" sel":""}"><input type="checkbox" data-h="${i}" ${pick.includes(h)?"checked":""} ${pick.length>=3&&!pick.includes(h)?"disabled":""}> ${esc(h)}</label>`).join("")}<button class="btn" id="pl-go" ${pick.length===3?"":"disabled"}>🌱 Take the pledge</button></div>`;
+  $$("#pl-wrap input").forEach(c=>c.onchange=()=>{const h=HABS[c.dataset.h];pick=c.checked?[...pick,h]:pick.filter(x=>x!==h);renderPledge()});
+  $("#pl-go").onclick=()=>{if(pick.length!==3)return;S.pledge={h:pick,d:today()};save();renderPledge();toast("Thank you for taking the Green Pledge! 🌍")};
+}
+
+/* router */
+const VIEWS=["home","dashboard","water","electricity","tips","progress","ethics"];let cur="home";
+function render(){
+  if(cur==="dashboard")renderDash();else if(cur==="water")renderList("w");else if(cur==="electricity")renderList("e");
+  else if(cur==="tips")renderTips();else if(cur==="progress")renderProg();else if(cur==="ethics")renderPledge();
+}
+function go(){let h=location.hash.slice(1);if(!VIEWS.includes(h))h="home";cur=h;
+  $$(".view").forEach(v=>v.hidden=v.id!=="v-"+h);$$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.v===h));
+  $("#nav").classList.remove("open");render();scrollTo(0,0)}
+addEventListener("hashchange",go);
+$("#burger").onclick=()=>$("#nav").classList.toggle("open");
+
+/* forms */
+const CFG={w:{max:5000,name:"Water"},e:{max:500,name:"Electricity"}};
+const edit={w:null,e:null};
+["w","e"].forEach(k=>{
+  const f=$("#f-"+k),d=$("#"+k+"-d");d.value=today();d.max=today();
+  function clear(){edit[k]=null;f.reset();d.value=today();$("#"+k+"-btn").textContent="Save entry";$("#"+k+"-cancel").hidden=true;$("#"+k+"-title").textContent="Add entry";$("#"+k+"-err").textContent=""}
+  $("#"+k+"-cancel").onclick=clear;
+  f.onsubmit=e=>{e.preventDefault();const err=$("#"+k+"-err"),v=parseFloat($("#"+k+"-v").value),dt=d.value;
+    if(!dt){err.textContent="Please choose a date.";return}
+    if(dt>today()){err.textContent="Date can’t be in the future.";return}
+    if(!isFinite(v)||v<=0){err.textContent="Enter a number greater than 0.";return}
+    if(v>CFG[k].max){err.textContent=`That seems too high. Please enter ${CFG[k].max} ${U[k]} or less.`;return}
+    const n=$("#"+k+"-n").value,val=r1(v);
+    if(edit[k]){const x=S.entries.find(z=>z.id===edit[k]);if(x){x.d=dt;x.v=val;x.n=n}toast("Entry updated ✓")}
+    else{S.entries.push({id:uid(),t:k,d:dt,v:val,n});toast(CFG[k].name+" entry saved ✓")}
+    save();clear();render();
+    const m=encourage();if(m.startsWith("🎉")||m.startsWith("🌿"))setTimeout(()=>toast(m.slice(0,110)),2900)};
+  $("#"+k+"-list").onclick=async e=>{const b=e.target.closest("button");if(!b)return;const x=S.entries.find(z=>z.id===b.dataset.id);if(!x)return;
+    if(b.dataset.act==="edit"){edit[k]=x.id;d.value=x.d;$("#"+k+"-v").value=x.v;$("#"+k+"-n").value=x.n||"";$("#"+k+"-btn").textContent="Update entry";$("#"+k+"-cancel").hidden=false;$("#"+k+"-title").textContent="Edit entry";f.scrollIntoView({behavior:"smooth",block:"center"})}
+    else if(await ask("Delete this entry?",`${x.v} ${U[k]} on ${fmtD(x.d)} will be removed.`,"Delete")){S.entries=S.entries.filter(z=>z.id!==x.id);if(edit[k]===x.id)clear();save();render();toast("Entry deleted")}};
+});
+
+/* dashboard actions */
+$("#g-save").onclick=()=>{const w=parseFloat($("#g-w").value),e=parseFloat($("#g-e").value),er=$("#g-err");
+  if(!(w>0&&w<=5000)||!(e>0&&e<=500)){er.textContent="Enter goals above 0 (water up to 5000 L, electricity up to 500 kWh).";return}
+  er.textContent="";S.goals={w:r1(w),e:r1(e)};save();render();toast("Goals saved ✓")};
+$("#sample").onclick=async()=>{if(!await ask("Load sample data?","This adds 14 days of made-up example entries so you can see the charts. You can remove everything with Reset.","Add sample"))return;
+  for(let i=13;i>=0;i--){const d=addD(today(),-i),f=i>6?1:.85;
+    S.entries.push({id:uid(),t:"w",d,v:r1((140+Math.random()*50)*f),n:"Sample"},{id:uid(),t:"e",d,v:r1((5+Math.random()*3)*f),n:"Sample"})}
+  save();render();toast("Sample data added")};
+$("#reset").onclick=async()=>{if(!await ask("Reset all data?","This permanently deletes every entry, your goals and your pledge from this browser. It can’t be undone.","Yes, reset"))return;
+  S={entries:[],goals:{w:150,e:6},pledge:null};pick=[];try{localStorage.removeItem(KEY)}catch(e){}render();toast("All data has been reset")};
+$("#t-next").onclick=()=>{tOff++;renderTips()};
+go();
+</script>
+</body>
+</html>
